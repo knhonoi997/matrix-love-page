@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Matrix Love Confession 💘</title>
   <style>
     html, body {
@@ -19,6 +19,7 @@
       top: 0; left: 0;
       z-index: 0;
     }
+    /* Chữ bay */
     .floating-text {
       position: absolute;
       color: #ff99cc;
@@ -26,12 +27,32 @@
       animation: floatText 6s linear forwards;
       text-shadow: 0 0 10px #ff66cc, 0 0 20px #ff99ff;
       pointer-events: none;
-      z-index: 2;
+      max-width: 90vw;
+      white-space: normal;
+      word-wrap: break-word;
     }
     @keyframes floatText {
       0% { transform: translateY(0) scale(1); opacity: 1; }
       100% { transform: translateY(-150px) scale(1.2) rotate(10deg); opacity: 0; }
     }
+    /* Khung tin nhắn ở giữa */
+    .center-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      background: rgba(0,0,0,0.6);
+      padding: 12px 18px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 18px;
+      max-width: 80vw;
+      text-align: center;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    /* Nút bật nhạc */
     #play-btn {
       position: fixed;
       top: 20px;
@@ -45,27 +66,9 @@
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
-    /* Tin nhắn ở giữa */
-    .center-message {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 182, 193, 0.9);
-      color: black;
-      padding: 15px 20px;
-      border-radius: 20px;
-      max-width: 80%;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 0 15px rgba(255, 105, 180, 0.7);
-      z-index: 5;
-      white-space: pre-wrap;
-    }
     @media (max-width: 600px) {
       .floating-text { font-size: 18px; }
-      .center-message { font-size: 16px; max-width: 90%; }
+      .center-message { font-size: 16px; padding: 10px 14px; }
     }
   </style>
 </head>
@@ -73,8 +76,10 @@
 
 <canvas id="matrixCanvas"></canvas>
 
-<!-- Tin nhắn giữa màn hình -->
-<div class="center-message" id="centerMsg">...</div>
+<!-- Nội dung tin nhắn ở giữa -->
+<div class="center-message">
+  Đây là tin nhắn nội dung chính – đọc dễ hơn 💌
+</div>
 
 <!-- Nhạc nền -->
 <audio id="bg-music" loop>
@@ -91,8 +96,8 @@
 
   const letters = "01💖💘💗💕💞💓";
   const fontSize = 16;
-  let columns = Math.floor(canvas.width / fontSize);
-  let drops = Array(columns).fill(1);
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
 
   function drawMatrix() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
@@ -109,21 +114,15 @@
       ctx.fillStyle = gradient;
       ctx.fillText(char, x, y);
 
-      if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      if (y > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
       drops[i]++;
     }
   }
   setInterval(drawMatrix, 33);
 
-  // --- Resize canvas ---
-  window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    columns = Math.floor(canvas.width / fontSize);
-    drops = Array(columns).fill(1);
-  });
-
-  // --- Danh sách tin nhắn ---
+  // --- Chữ tỏ tình bay ---
   const messages = [
     "Anh thích em 💘",
     "Làm người yêu anh nha? 🥺",
@@ -134,7 +133,6 @@
     "Đây không phải bug... Đây là yêu 💗"
   ];
 
-  // --- Chữ bay loạn ---
   function createFloatingText() {
     const text = document.createElement("div");
     text.className = "floating-text";
@@ -143,30 +141,10 @@
     text.style.top = Math.random() * window.innerHeight + "px";
     text.style.fontSize = (Math.random() * 20 + 20) + "px";
     document.body.appendChild(text);
+
     setTimeout(() => text.remove(), 6000);
   }
   setInterval(createFloatingText, 400);
-
-  // --- Hiển thị tin nhắn giữa ---
-  const centerMsg = document.getElementById("centerMsg");
-  let msgIndex = 0;
-  function showCenterMessage() {
-    let text = messages[msgIndex];
-    centerMsg.textContent = "";
-    let i = 0;
-    let interval = setInterval(() => {
-      centerMsg.textContent += text[i];
-      i++;
-      if (i >= text.length) {
-        clearInterval(interval);
-        setTimeout(() => {
-          msgIndex = (msgIndex + 1) % messages.length;
-          showCenterMessage();
-        }, 2000); // chờ 2s rồi đổi sang tin nhắn tiếp theo
-      }
-    }, 80); // tốc độ gõ chữ
-  }
-  showCenterMessage();
 
   // --- Nhạc nền ---
   const music = document.getElementById("bg-music");
@@ -181,6 +159,7 @@
       console.error("Không phát được nhạc:", err);
     }
   }
+
   btn.addEventListener("click", startMusic);
   document.body.addEventListener("click", startMusic);
 </script>
