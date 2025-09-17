@@ -19,39 +19,43 @@
       top: 0; left: 0;
       z-index: 0;
     }
+
     /* Chữ bay */
     .floating-text {
       position: absolute;
-      color: #ff99cc;
-      font-size: 24px;
-      animation: floatText 6s linear forwards;
-      text-shadow: 0 0 10px #ff66cc, 0 0 20px #ff99ff;
+      color: #ffb6c1;
+      font-size: 22px;
+      text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff99ff;
       pointer-events: none;
-      max-width: 90vw;
-      white-space: normal;
-      word-wrap: break-word;
+      animation: smoothFloat 8s ease-in-out forwards;
+      white-space: nowrap;
+      z-index: 1;
     }
-    @keyframes floatText {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-150px) scale(1.2) rotate(10deg); opacity: 0; }
+    @keyframes smoothFloat {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 1; }
+      50%  { transform: translateY(-80px) translateX(30px) scale(1.1); opacity: 0.9; }
+      100% { transform: translateY(-160px) translateX(-30px) scale(1.2); opacity: 0; }
     }
+
     /* Khung tin nhắn ở giữa */
     .center-message {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      z-index: 2;
-      background: rgba(0,0,0,0.6);
+      z-index: 5;
+      background: rgba(255,182,193,0.15);
       padding: 12px 18px;
-      border-radius: 12px;
+      border-radius: 20px;
       color: #fff;
-      font-size: 18px;
+      font-size: 20px;
       max-width: 80vw;
       text-align: center;
       line-height: 1.4;
-      word-wrap: break-word;
+      white-space: nowrap;
+      box-shadow: 0 0 15px rgba(255,105,180,0.3);
     }
+
     /* Nút bật nhạc */
     #play-btn {
       position: fixed;
@@ -66,9 +70,10 @@
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
+
     @media (max-width: 600px) {
-      .floating-text { font-size: 18px; }
-      .center-message { font-size: 16px; padding: 10px 14px; }
+      .floating-text { font-size: 16px; }
+      .center-message { font-size: 16px; padding: 10px 14px; max-width: 90vw; }
     }
   </style>
 </head>
@@ -77,8 +82,8 @@
 <canvas id="matrixCanvas"></canvas>
 
 <!-- Nội dung tin nhắn ở giữa -->
-<div class="center-message">
-  Đây là tin nhắn nội dung chính – đọc dễ hơn 💌
+<div class="center-message" id="centerMsg">
+  Trái tim anh chỉ muốn ở cạnh em mãi thôi 💞
 </div>
 
 <!-- Nhạc nền -->
@@ -88,16 +93,22 @@
 <button id="play-btn">Bật nhạc 🎵</button>
 
 <script>
-  // --- Hiệu ứng Matrix ---
+  // --- Canvas Matrix ---
   const canvas = document.getElementById("matrixCanvas");
   const ctx = canvas.getContext("2d");
-  canvas.height = window.innerHeight;
-  canvas.width = window.innerWidth;
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    columns = Math.floor(canvas.width / fontSize);
+    drops = Array(columns).fill(1);
+  }
+  window.addEventListener('resize', resizeCanvas);
 
   const letters = "01💖💘💗💕💞💓";
   const fontSize = 16;
-  const columns = Math.floor(canvas.width / fontSize);
-  const drops = Array(columns).fill(1);
+  let columns = Math.floor(window.innerWidth / fontSize);
+  let drops = Array(columns).fill(1);
+  resizeCanvas();
 
   function drawMatrix() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
@@ -122,29 +133,29 @@
   }
   setInterval(drawMatrix, 33);
 
-  // --- Chữ tỏ tình bay ---
+  // --- Các câu lãng mạn ---
   const messages = [
-    "Anh thích em 💘",
-    "Làm người yêu anh nha? 🥺",
-    "Quét là đồng ý đó nha 😳",
-    "Em = const trái_tim_của_anh;",
-    "Từ khi gặp em, anh crash thật rồi 💻💖",
-    "Em đẹp hơn cả AI vẽ 😭",
-    "Đây không phải bug... Đây là yêu 💗"
+    "Em chính là định mệnh của đời anh 💘",
+    "Có em, mọi thứ trở nên hoàn hảo 💖",
+    "Anh chỉ muốn nắm tay em mãi mãi 💕",
+    "Yêu em hơn cả ngôn từ có thể nói 💞",
+    "Em là giấc mơ đẹp nhất của anh 🌙",
+    "Cả thế giới này, anh chỉ cần em 💓",
+    "Trái tim anh đập là vì em 💗"
   ];
 
+  // --- Chữ bay ---
   function createFloatingText() {
     const text = document.createElement("div");
     text.className = "floating-text";
     text.textContent = messages[Math.floor(Math.random() * messages.length)];
-    text.style.left = Math.random() * window.innerWidth + "px";
-    text.style.top = Math.random() * window.innerHeight + "px";
-    text.style.fontSize = (Math.random() * 20 + 20) + "px";
+    text.style.left = Math.random() * (window.innerWidth - 150) + "px";
+    text.style.top = Math.random() * (window.innerHeight - 50) + "px";
+    text.style.fontSize = (Math.random() * 12 + 18) + "px";
     document.body.appendChild(text);
-
-    setTimeout(() => text.remove(), 6000);
+    setTimeout(() => text.remove(), 8000);
   }
-  setInterval(createFloatingText, 400);
+  setInterval(createFloatingText, 1000);
 
   // --- Nhạc nền ---
   const music = document.getElementById("bg-music");
@@ -159,7 +170,6 @@
       console.error("Không phát được nhạc:", err);
     }
   }
-
   btn.addEventListener("click", startMusic);
   document.body.addEventListener("click", startMusic);
 </script>
