@@ -27,14 +27,13 @@
       font-size: 22px;
       text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff99ff;
       pointer-events: none;
-      animation: smoothFloat 8s ease-in-out forwards;
+      animation: smoothFloat 5s ease-in-out forwards;
       white-space: nowrap;
       z-index: 1;
     }
     @keyframes smoothFloat {
       0%   { transform: translateY(0) translateX(0) scale(1); opacity: 1; }
-      50%  { transform: translateY(-80px) translateX(30px) scale(1.1); opacity: 0.9; }
-      100% { transform: translateY(-160px) translateX(-30px) scale(1.2); opacity: 0; }
+      100% { transform: translateY(-200px) translateX(calc(-50px + 100px * random())) scale(1.2); opacity: 0; }
     }
 
     /* Khung tin nhắn ở giữa */
@@ -49,11 +48,17 @@
       border-radius: 20px;
       color: #fff;
       font-size: 20px;
-      max-width: 80vw;
+      max-width: 90vw;
       text-align: center;
       line-height: 1.4;
-      white-space: nowrap;
       box-shadow: 0 0 15px rgba(255,105,180,0.3);
+      white-space: normal; /* Cho phép xuống dòng */
+      overflow-wrap: break-word;
+    }
+    .typing {
+      border-right: 2px solid #ff99cc;
+      display: inline-block;
+      white-space: pre-wrap;
     }
 
     /* Nút bật nhạc */
@@ -73,7 +78,7 @@
 
     @media (max-width: 600px) {
       .floating-text { font-size: 16px; }
-      .center-message { font-size: 16px; padding: 10px 14px; max-width: 90vw; }
+      .center-message { font-size: 16px; padding: 10px 14px; }
     }
   </style>
 </head>
@@ -82,8 +87,8 @@
 <canvas id="matrixCanvas"></canvas>
 
 <!-- Nội dung tin nhắn ở giữa -->
-<div class="center-message" id="centerMsg">
-  Trái tim anh chỉ muốn ở cạnh em mãi thôi 💞
+<div class="center-message">
+  <span id="typing" class="typing"></span>
 </div>
 
 <!-- Nhạc nền -->
@@ -149,13 +154,44 @@
     const text = document.createElement("div");
     text.className = "floating-text";
     text.textContent = messages[Math.floor(Math.random() * messages.length)];
-    text.style.left = Math.random() * (window.innerWidth - 150) + "px";
-    text.style.top = Math.random() * (window.innerHeight - 50) + "px";
+    text.style.left = Math.random() * (window.innerWidth - 100) + "px";
+    text.style.top = Math.random() * (window.innerHeight - 100) + "px";
     text.style.fontSize = (Math.random() * 12 + 18) + "px";
     document.body.appendChild(text);
-    setTimeout(() => text.remove(), 8000);
+    setTimeout(() => text.remove(), 5000);
   }
-  setInterval(createFloatingText, 1000);
+  setInterval(createFloatingText, 300); // nhanh hơn
+
+  // --- Hiệu ứng đánh máy cho câu ở giữa ---
+  const centerMessages = [
+    "Anh có một bí mật muốn nói với em...",
+    "Thật ra, anh đã thích em từ rất lâu rồi 💘",
+    "Làm người yêu anh nhé? 🥺"
+  ];
+  let msgIndex = 0;
+  let charIndex = 0;
+  const typingElement = document.getElementById("typing");
+
+  function typeText() {
+    if (charIndex < centerMessages[msgIndex].length) {
+      typingElement.textContent += centerMessages[msgIndex].charAt(charIndex);
+      charIndex++;
+      setTimeout(typeText, 80);
+    } else {
+      setTimeout(eraseText, 2000);
+    }
+  }
+  function eraseText() {
+    if (charIndex > 0) {
+      typingElement.textContent = centerMessages[msgIndex].substring(0, charIndex - 1);
+      charIndex--;
+      setTimeout(eraseText, 40);
+    } else {
+      msgIndex = (msgIndex + 1) % centerMessages.length;
+      setTimeout(typeText, 500);
+    }
+  }
+  typeText();
 
   // --- Nhạc nền ---
   const music = document.getElementById("bg-music");
