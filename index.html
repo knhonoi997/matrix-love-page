@@ -69,13 +69,28 @@
 
 <canvas id="matrixCanvas"></canvas>
 
-<!-- Nhúng nhạc YouTube -->
-<iframe id="yt-audio"
-    src="https://www.youtube.com/embed/V1Tzgdh53mA?autoplay=1&loop=1&playlist=V1Tzgdh53mA&mute=0"
-    frameborder="0"
-    allow="autoplay"
-    allow="encrypted-media">
-</iframe>
+<!-- Phần phát nhạc -->
+<audio id="bg-music" loop>
+  <source src="tenfile.mp3" type="audio/mpeg">
+  Trình duyệt của bạn không hỗ trợ audio.
+</audio>
+
+<!-- Nút phát nhạc cho mobile -->
+<button id="play-btn" style="
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  padding: 10px 20px;
+  background: pink;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+">
+  Bật nhạc 🎵
+</button>
 
 <script>
   // Nền Matrix
@@ -141,3 +156,4 @@
 
 </body>
 </html>
+
